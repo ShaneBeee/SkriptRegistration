@@ -1,6 +1,5 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "9.3.0"
     id("maven-publish")
 }
 
@@ -37,3 +36,15 @@ dependencies {
     compileOnly("commons-io:commons-io:2.14.0")
     compileOnly("org.apache.commons:commons-text:1.10.0")
 }
+
+tasks {
+    jar {
+        archiveBaseName.set("SkriptRegistration-$projectVersion")
+    }
+    java {
+
+        withJavadocJar()
+        withSourcesJar()
+    }
+}
+
