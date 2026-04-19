@@ -10,7 +10,7 @@ configurations.matching { it.isCanBeResolved }.configureEach {
 }
 
 // Version of SkriptRegistration
-val projectVersion = "1.0.0"
+val projectVersion = "1.0.1"
 
 java.sourceCompatibility = JavaVersion.VERSION_25
 
@@ -45,6 +45,21 @@ tasks {
 
         withJavadocJar()
         withSourcesJar()
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.shanebeee"
+            artifactId = "SkriptRegistration"
+            version = projectVersion
+
+            artifact(tasks["jar"])
+
+            // This adds the sources jar
+            artifact(tasks["sourcesJar"])
+        }
     }
 }
 
