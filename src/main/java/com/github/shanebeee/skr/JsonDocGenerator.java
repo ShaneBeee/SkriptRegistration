@@ -511,6 +511,12 @@ public class JsonDocGenerator {
     @SuppressWarnings("CallToPrintStackTrace")
     private void printToFile(JsonObject jsonElement) {
         File dataFolder = this.plugin.getDataFolder();
+        if (!dataFolder.exists()) {
+            if (!dataFolder.mkdirs()) {
+                Utils.log("&cFailed to create data folder");
+                return;
+            }
+        }
         File file = new File(dataFolder, "json-docs.json");
         try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(jsonElement, writer);
