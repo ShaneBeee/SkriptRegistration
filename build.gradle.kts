@@ -10,9 +10,9 @@ configurations.matching { it.isCanBeResolved }.configureEach {
 }
 
 // Version of SkriptRegistration
-val projectVersion = "1.0.2"
+val projectVersion = "1.0.3"
 
-java.sourceCompatibility = JavaVersion.VERSION_25
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenCentral()
