@@ -19,6 +19,8 @@ import ch.njol.skript.lang.Section;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.registrations.Classes;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.Keyed;
 import org.bukkit.Registry;
 import org.bukkit.event.Event;
@@ -543,6 +545,20 @@ public class Registration {
     }
 
     /**
+     * Create a new RegistryTypeRegistrar.
+     *
+     * @param registryKey Key of registry to register
+     * @param type        Class to register
+     * @param codename    Codename of new type
+     * @param <T>         Type of class to register.
+     * @return New RegistryTypeRegistrar (Don't forget to register it!)
+     */
+    public <T extends Keyed> RegistryTypeRegistrar<T> newRegistryType(RegistryKey<T> registryKey, Class<T> type, String codename) {
+        Registry<T> registry = RegistryAccess.registryAccess().getRegistry(registryKey);
+        return new RegistryTypeRegistrar<>(registry, type, codename, true, null, null);
+    }
+
+    /**
      * Create a new RegistryTypeRegistrar with a custom prefix and suffix.
      *
      * @param registry    Registry instance
@@ -559,6 +575,21 @@ public class Registration {
     /**
      * Create a new RegistryTypeRegistrar with a custom prefix and suffix.
      *
+     * @param registryKey Key of registry to register
+     * @param type        Class to register
+     * @param createUsage Whether to create usage for the registry type
+     * @param codename    Codename of new type
+     * @param <T>         Type of class to register.
+     * @return New RegistryTypeRegistrar (Don't forget to register it!)
+     */
+    public <T extends Keyed> RegistryTypeRegistrar<T> newRegistryType(RegistryKey<T> registryKey, Class<T> type, boolean createUsage, String codename) {
+        Registry<T> registry = RegistryAccess.registryAccess().getRegistry(registryKey);
+        return new RegistryTypeRegistrar<>(registry, type, codename, createUsage, null, null);
+    }
+
+    /**
+     * Create a new RegistryTypeRegistrar with a custom prefix and suffix.
+     *
      * @param registry Registry instance
      * @param type     Class to register
      * @param codename Codename of new type
@@ -568,6 +599,22 @@ public class Registration {
      * @return New RegistryTypeRegistrar (Don't forget to register it!)
      */
     public <T extends Keyed> RegistryTypeRegistrar<T> newRegistryType(Registry<T> registry, Class<T> type, String codename, String prefix, String suffix) {
+        return new RegistryTypeRegistrar<>(registry, type, codename, true, prefix, suffix);
+    }
+
+    /**
+     * Create a new RegistryTypeRegistrar with a custom prefix and suffix.
+     *
+     * @param registryKey Key of registry to register
+     * @param type        Class to register
+     * @param codename    Codename of new type
+     * @param prefix      Custom prefix for registry type names
+     * @param suffix      Custom suffix for registry type names
+     * @param <T>         Type of class to register.
+     * @return New RegistryTypeRegistrar (Don't forget to register it!)
+     */
+    public <T extends Keyed> RegistryTypeRegistrar<T> newRegistryType(RegistryKey<T> registryKey, Class<T> type, String codename, String prefix, String suffix) {
+        Registry<T> registry = RegistryAccess.registryAccess().getRegistry(registryKey);
         return new RegistryTypeRegistrar<>(registry, type, codename, true, prefix, suffix);
     }
 
