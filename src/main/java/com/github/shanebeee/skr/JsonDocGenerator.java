@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Generator for JSON documentation for Skript addons.
+ */
+@SuppressWarnings("unused")
 public class JsonDocGenerator {
 
     private final Plugin plugin;
@@ -44,6 +48,12 @@ public class JsonDocGenerator {
         this.registration = registration;
     }
 
+    /**
+     * Initializes the generator.
+     * <p>
+     * Docs will be put into the plugin's data folder.
+     * </p>
+     */
     public void generateDocs() {
         long start = System.currentTimeMillis();
         Utils.log("Generating docs...");

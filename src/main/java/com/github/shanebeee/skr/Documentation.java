@@ -1,5 +1,11 @@
 package com.github.shanebeee.skr;
 
+/**
+ * Documentation for Skript elements.
+ * <p>
+ * Used by {@link JsonDocGenerator}
+ * </p>
+ */
 public class Documentation {
 
     private boolean noDoc;
@@ -13,6 +19,11 @@ public class Documentation {
         this.noDoc = noDoc;
     }
 
+    /**
+     * Whether this element should be excluded from documentation generation.
+     *
+     * @return Whether this element should be excluded from documentation generation.
+     */
     public boolean isNoDoc() {
         return noDoc;
     }

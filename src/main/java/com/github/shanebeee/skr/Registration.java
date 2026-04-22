@@ -46,7 +46,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+/**
+ * Registration for registering elements to Skript.
+ */
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 public class Registration {
 
     private final SkriptAddon addon;
@@ -63,6 +66,12 @@ public class Registration {
     private final List<EventValueRegistrar<?, ?>> eventValues = new ArrayList<>();
     private final Map<Class<? extends Event>, List<EventValueRegistrar<?, ?>>> eventValuesByEvent = new HashMap<>();
 
+    /**
+     * Create a new registration.
+     *
+     * @param name        Name of the addon
+     * @param includeLang Whether to include the language file
+     */
     public Registration(String name, boolean includeLang) {
         this.addon = Skript.instance().registerAddon(RegistrationAddonModule.class, name);
         if (includeLang) {
@@ -71,48 +80,98 @@ public class Registration {
         this.module = new RegistrationAddonModule(name, this);
     }
 
+    /**
+     * Get the {@link SkriptAddon addon} this registration belongs to.
+     *
+     * @return The addon this registration belongs to
+     */
     public SkriptAddon getAddon() {
         return this.addon;
     }
 
+    /**
+     * Get all registered {@link ClassInfo ClassInfos}.
+     *
+     * @return All ClassInfos
+     */
     public List<TypeRegistrar<?>> getTypes() {
         return this.types;
     }
 
+    /**
+     * Get all registered {@link Effect Effects}.
+     *
+     * @return All effects
+     */
     public List<EffectRegistrar> getEffects() {
         return this.effects;
     }
 
+    /**
+     * Get all registered {@link Condition Conditions}.
+     *
+     * @return All conditions
+     */
     public List<ConditionRegistrar> getConditions() {
         return this.conditions;
     }
 
+    /**
+     * Get all registered {@link Event Events}.
+     *
+     * @return All events
+     */
     public List<EventRegistrar> getEvents() {
         return this.events;
     }
 
+    /**
+     * Get all registered {@link Section Sections}.
+     *
+     * @return All sections
+     */
     public List<SectionRegistrar> getSections() {
         return this.sections;
     }
 
+    /**
+     * Get all registered {@link Expression Expressions}.
+     *
+     * @return All expressions
+     */
     public List<ExpressionRegistrar> getExpressions() {
         return this.expressions;
     }
 
+    /**
+     * Get all registered {@link Structure Structures}.
+     *
+     * @return All structures
+     */
     public List<StructureRegistrar<?>> getStructures() {
         return this.structures;
     }
 
+    /**
+     * Get all registered {@link ch.njol.skript.lang.function.Function Functions}.
+     *
+     * @return All functions
+     */
     public List<FunctionRegistrar> getFunctions() {
         return this.functions;
     }
 
+    /**
+     * Get all registered {@link EventValue EventValues}.
+     *
+     * @return All event values
+     */
     public List<EventValueRegistrar<?, ?>> getEventValues() {
         return this.eventValues;
     }
 
     /**
-     * Get all event values that are registered for the given event class.
+     * Get all {@link EventValue EventValues} that are registered for the given event class.
      *
      * @param eventClass Event class to get event values for.
      * @return List of event values.
@@ -130,53 +189,106 @@ public class Registration {
         return List.of();
     }
 
+    /**
+     * Base Registrar for all Skript element registrations.
+     *
+     * @param <T> Type of registrar
+     */
     @SuppressWarnings("unchecked")
     public class Registrar<T extends Registrar<T>> {
         private final Documentation documentation = new Documentation();
         private boolean registered;
 
-        public Registrar() {
+        private Registrar() {
             Registration.this.preRegistrations.add(this);
         }
 
+        /**
+         * Exclude docs for this syntax.
+         *
+         * @return This registrar for chaining.
+         */
         public T noDoc() {
             this.documentation.setNoDoc(true);
             return (T) this;
         }
 
+        /**
+         * The documentation name of this syntax.
+         *
+         * @param name The name of this syntax.
+         * @return This registrar for chaining.
+         */
         public T name(String name) {
             this.documentation.setName(name);
             return (T) this;
         }
 
+        /**
+         * The documentation description of this syntax.
+         *
+         * @param description The description of this syntax.
+         * @return This registrar for chaining.
+         */
         public T description(String... description) {
             this.documentation.setDescription(description);
             return (T) this;
         }
 
+        /**
+         * The documentation examples of this syntax.
+         *
+         * @param examples The examples of this syntax.
+         * @return This registrar for chaining.
+         */
         public T examples(String... examples) {
             this.documentation.setExamples(examples);
             return (T) this;
         }
 
+        /**
+         * The documentation search keywords of this syntax.
+         *
+         * @param keywords The search keywords of this syntax.
+         * @return This registrar for chaining.
+         */
         public T keywords(String... keywords) {
             this.documentation.setKeywords(keywords);
             return (T) this;
         }
 
+        /**
+         * When this syntax was added.
+         *
+         * @param since When this syntax was added.
+         * @return This registrar for chaining.
+         */
         public T since(String... since) {
             this.documentation.setSince(since);
             return (T) this;
         }
 
+        /**
+         * Get the documentation of this syntax.
+         *
+         * @return The documentation of this syntax.
+         */
         public Documentation getDocumentation() {
             return this.documentation;
         }
 
+        /**
+         * Check if this syntax is registered.
+         *
+         * @return Whether this syntax is registered.
+         */
         public boolean isRegistered() {
             return this.registered;
         }
 
+        /**
+         * Finalize registration for this registrar.
+         */
         public void register() {
             if (this.registered) {
                 skriptError("Syntax '%s' is already registered!", this.documentation.getName());
@@ -186,21 +298,26 @@ public class Registration {
         }
     }
 
+    /**
+     * Registrar for {@link ClassInfo ClassInfos}.
+     *
+     * @param <T> Type of class to register.
+     */
     public class TypeRegistrar<T> extends Registrar<TypeRegistrar<T>> {
-        public final Class<T> type;
-        public final String codename;
-        public String[] user;
-        public String[] after;
-        public String[] before;
-        public String usage;
-        public DefaultExpression<T> defaultExpression;
-        public @Nullable Supplier<Iterator<T>> supplier;
-        public Parser<? extends T> parser;
-        public Serializer<? super T> serializer;
-        public Cloner<T> cloner;
-        public Changer<? super T> changer;
+        final Class<T> type;
+        final String codename;
+        String[] user;
+        String[] after;
+        String[] before;
+        String usage;
+        DefaultExpression<T> defaultExpression;
+        @Nullable Supplier<Iterator<T>> supplier;
+        Parser<? extends T> parser;
+        Serializer<? super T> serializer;
+        Cloner<T> cloner;
+        Changer<? super T> changer;
 
-        public TypeRegistrar(Class<T> type, String codename) {
+        private TypeRegistrar(Class<T> type, String codename) {
             this.type = type;
             this.codename = codename;
         }
@@ -261,17 +378,30 @@ public class Registration {
         }
     }
 
+    /**
+     * Get a new {@link TypeRegistrar TypeRegistrar} for a custom {@link ClassInfo}.
+     *
+     * @param type     Class to register
+     * @param codename Codename of new type
+     * @param <T>      Type of class to register.
+     * @return New Type Registrar (Don't forget to register it!)
+     */
     public <T> TypeRegistrar<T> newType(Class<T> type, String codename) {
         return new TypeRegistrar<>(type, codename);
     }
 
+    /**
+     * Registrar for Enum {@link ClassInfo ClassInfos}.
+     *
+     * @param <T>
+     */
     public class EnumTypeRegistrar<T extends Enum<T>> extends TypeRegistrar<T> {
-        public final String prefix;
-        public final String suffix;
-        public final @NotNull EnumWrapper<T> enumWrapper;
-        public final ClassInfo<T> classInfo;
+        final String prefix;
+        final String suffix;
+        final @NotNull EnumWrapper<T> enumWrapper;
+        final ClassInfo<T> classInfo;
 
-        public EnumTypeRegistrar(Class<T> type, String codename, String prefix, String suffix, boolean plurals) {
+        private EnumTypeRegistrar(Class<T> type, String codename, String prefix, String suffix, boolean plurals) {
             super(type, codename);
             this.prefix = prefix;
             this.suffix = suffix;
@@ -280,7 +410,7 @@ public class Registration {
             this.classInfo = this.enumWrapper.getClassInfo(codename);
         }
 
-        public EnumTypeRegistrar(Class<T> type, @NotNull EnumWrapper<T> enumWrapper, String codename, String prefix, String suffix) {
+        private EnumTypeRegistrar(Class<T> type, @NotNull EnumWrapper<T> enumWrapper, String codename, String prefix, String suffix) {
             super(type, codename);
             this.prefix = prefix;
             this.suffix = suffix;
@@ -290,38 +420,101 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new {@link EnumTypeRegistrar} for a custom {@link EnumWrapper EnumClassInfo}.
+     *
+     * @param type     Class to register
+     * @param codename Codename of new type
+     * @param <T>      Type of class to register.
+     * @return New EnumTypeRegistrar (Don't forget to register it!)
+     */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, String codename) {
         return new EnumTypeRegistrar<>(type, codename, null, null, false);
     }
 
+    /**
+     * Create a new {@link EnumTypeRegistrar} for a custom {@link EnumWrapper EnumClassInfo} with a custom prefix and suffix.
+     *
+     * @param type     Class to register
+     * @param codename Codename of new type
+     * @param plurals  Whether to include plural forms of the enum names
+     * @param <T>      Type of class to register.
+     * @return New EnumTypeRegistrar (Don't forget to register it!)
+     */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, String codename, boolean plurals) {
         return new EnumTypeRegistrar<>(type, codename, null, null, plurals);
     }
 
+    /**
+     * Create a new {@link EnumTypeRegistrar} for a custom {@link EnumWrapper EnumClassInfo} with a custom prefix and suffix.
+     *
+     * @param type     Class to register
+     * @param codename Codename of new type
+     * @param prefix   Custom prefix for enum names
+     * @param suffix   Custom suffix for enum names
+     * @param <T>      Type of class to register.
+     * @return New EnumTypeRegistrar (Don't forget to register it!)
+     */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, String codename, String prefix, String suffix) {
         return new EnumTypeRegistrar<>(type, codename, prefix, suffix, false);
     }
 
+    /**
+     * Create a new @link EnumTypeRegistrar} for a custom {@link EnumWrapper EnumClassInfo} with a custom prefix and suffix.
+     *
+     * @param type     Class to register
+     * @param codename Codename of new type
+     * @param prefix   Custom prefix for enum names
+     * @param suffix   Custom suffix for enum names
+     * @param plurals  Whether to include plural forms of the enum names
+     * @param <T>      Type of class to register.
+     * @return New EnumTypeRegistrar (Don't forget to register it!)
+     */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, String codename, String prefix, String suffix, boolean plurals) {
         return new EnumTypeRegistrar<>(type, codename, prefix, suffix, plurals);
     }
 
+    /**
+     * Create a new {@link EnumTypeRegistrar} for a custom {@link EnumWrapper EnumClassInfo} with a custom prefix and suffix.
+     *
+     * @param type        Class to register
+     * @param enumWrapper Custom wrapper for enum values
+     * @param codename    Codename of new type
+     * @param <T>         Type of class to register.
+     * @return New EnumTypeRegistrar (Don't forget to register it!)
+     */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, EnumWrapper<T> enumWrapper, String codename) {
         return new EnumTypeRegistrar<>(type, enumWrapper, codename, null, null);
     }
 
+    /**
+     * Create a new {@link EnumTypeRegistrar} for a custom {@link EnumWrapper EnumClassInfo} with a custom prefix and suffix.
+     *
+     * @param type        Class to register
+     * @param enumWrapper Custom wrapper for enum values
+     * @param codename    Codename of new type
+     * @param prefix      Custom prefix for enum names
+     * @param suffix      Custom suffix for enum names
+     * @param <T>         Type of class to register.
+     * @return New EnumTypeRegistrar (Don't forget to register it!)
+     */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, EnumWrapper<T> enumWrapper, String codename, String prefix, String suffix) {
         return new EnumTypeRegistrar<>(type, enumWrapper, codename, prefix, suffix);
     }
 
+    /**
+     * Registrar for {@link Registry} {@link ClassInfo ClassInfos}.
+     *
+     * @param <T>
+     */
     public class RegistryTypeRegistrar<T extends Keyed> extends TypeRegistrar<T> {
-        public final Registry<T> registry;
-        public final String prefix;
-        public final String suffix;
-        public final boolean createUsage;
-        public final ClassInfo<T> classInfo;
+        final Registry<T> registry;
+        final String prefix;
+        final String suffix;
+        final boolean createUsage;
+        final ClassInfo<T> classInfo;
 
-        public RegistryTypeRegistrar(Registry<T> registry, Class<T> type, String codename, boolean createUsage, String prefix, String suffix) {
+        private RegistryTypeRegistrar(Registry<T> registry, Class<T> type, String codename, boolean createUsage, String prefix, String suffix) {
             super(type, codename);
             this.registry = registry;
             this.prefix = prefix;
@@ -336,23 +529,56 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new RegistryTypeRegistrar.
+     *
+     * @param registry Registry instance
+     * @param type     Class to register
+     * @param codename Codename of new type
+     * @param <T>      Type of class to register.
+     * @return New RegistryTypeRegistrar (Don't forget to register it!)
+     */
     public <T extends Keyed> RegistryTypeRegistrar<T> newRegistryType(Registry<T> registry, Class<T> type, String codename) {
         return new RegistryTypeRegistrar<>(registry, type, codename, true, null, null);
     }
 
+    /**
+     * Create a new RegistryTypeRegistrar with a custom prefix and suffix.
+     *
+     * @param registry    Registry instance
+     * @param type        Class to register
+     * @param createUsage Whether to create usage for the registry type
+     * @param codename    Codename of new type
+     * @param <T>         Type of class to register.
+     * @return New RegistryTypeRegistrar (Don't forget to register it!)
+     */
     public <T extends Keyed> RegistryTypeRegistrar<T> newRegistryType(Registry<T> registry, Class<T> type, boolean createUsage, String codename) {
         return new RegistryTypeRegistrar<>(registry, type, codename, createUsage, null, null);
     }
 
+    /**
+     * Create a new RegistryTypeRegistrar with a custom prefix and suffix.
+     *
+     * @param registry Registry instance
+     * @param type     Class to register
+     * @param codename Codename of new type
+     * @param prefix   Custom prefix for registry type names
+     * @param suffix   Custom suffix for registry type names
+     * @param <T>      Type of class to register.
+     * @return New RegistryTypeRegistrar (Don't forget to register it!)
+     */
     public <T extends Keyed> RegistryTypeRegistrar<T> newRegistryType(Registry<T> registry, Class<T> type, String codename, String prefix, String suffix) {
         return new RegistryTypeRegistrar<>(registry, type, codename, true, prefix, suffix);
     }
 
+    /**
+     * Registrar for {@link Effect Effects}.
+     */
     public class EffectRegistrar extends Registrar<EffectRegistrar> {
-        public final Class<? extends Effect> effect;
-        public final String[] patterns;
+        final Class<? extends Effect> effect;
+        final String[] patterns;
 
-        public EffectRegistrar(Class<? extends Effect> effect, String[] patterns) {
+        private EffectRegistrar(Class<? extends Effect> effect, String[] patterns) {
             this.effect = effect;
             this.patterns = patterns;
         }
@@ -363,16 +589,26 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new EffectRegistrar for a custom effect with patterns.
+     *
+     * @param effect   Class of the effect to register
+     * @param patterns Patterns for the effect
+     * @return New EffectRegistrar (Don't forget to register it!)
+     */
     public EffectRegistrar newEffect(Class<? extends Effect> effect, String... patterns) {
         return new EffectRegistrar(effect, patterns);
     }
 
+    /**
+     * Registrar for {@link Section Sections}.
+     */
     public class SectionRegistrar extends Registrar<SectionRegistrar> {
-        public final Class<? extends Section> section;
-        public final String[] patterns;
-        public final @Nullable EntryValidator validator;
+        final Class<? extends Section> section;
+        final String[] patterns;
+        final @Nullable EntryValidator validator;
 
-        public SectionRegistrar(Class<? extends Section> section, String[] patterns, @Nullable EntryValidator validator) {
+        private SectionRegistrar(Class<? extends Section> section, String[] patterns, @Nullable EntryValidator validator) {
             this.section = section;
             this.patterns = patterns;
             this.validator = validator;
@@ -384,19 +620,37 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new SectionRegistrar for a custom section with patterns.
+     *
+     * @param section  Class of the section to register
+     * @param patterns Patterns for the section
+     * @return New SectionRegistrar (Don't forget to register it!)
+     */
     public SectionRegistrar newSection(Class<? extends Section> section, String... patterns) {
         return new SectionRegistrar(section, patterns, null);
     }
 
+    /**
+     * Create a new SectionRegistrar for a custom section with patterns and validator.
+     *
+     * @param section   Class of the section to register
+     * @param validator Validator for the section entries
+     * @param patterns  Patterns for the section
+     * @return New SectionRegistrar (Don't forget to register it!)
+     */
     public SectionRegistrar newSection(Class<? extends Section> section, EntryValidator validator, String... patterns) {
         return new SectionRegistrar(section, patterns, validator);
     }
 
+    /**
+     * Registrar for {@link Condition Conditions}.
+     */
     public class ConditionRegistrar extends Registrar<ConditionRegistrar> {
-        public final Class<? extends Condition> condition;
-        public final String[] patterns;
+        final Class<? extends Condition> condition;
+        final String[] patterns;
 
-        public ConditionRegistrar(Class<? extends Condition> condition, String[] patterns) {
+        private ConditionRegistrar(Class<? extends Condition> condition, String[] patterns) {
             this.condition = condition;
             this.patterns = patterns;
         }
@@ -407,30 +661,60 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new ConditionRegistrar for a custom condition with patterns.
+     *
+     * @param condition Class of the condition to register
+     * @param patterns  Patterns for the condition
+     * @return New ConditionRegistrar (Don't forget to register it!)
+     */
     public ConditionRegistrar newCondition(Class<? extends Condition> condition, String... patterns) {
         return new ConditionRegistrar(condition, patterns);
     }
 
+    /**
+     * Registrar for {@link PropertyCondition PropertyConditions}.
+     */
     public class PropertyConditionRegistrar extends ConditionRegistrar {
         public PropertyConditionRegistrar(Class<? extends Condition> condition, PropertyType type, String property, String owner) {
             super(condition, PropertyCondition.getPatterns(type, property, owner));
         }
     }
 
+    /**
+     * Create a new PropertyConditionRegistrar for a custom condition with property and owner.
+     *
+     * @param condition Class of the condition to register
+     * @param type      Type of property condition
+     * @param property  Property name
+     * @param owner     Owner of the property
+     * @return New PropertyConditionRegistrar (Don't forget to register it!)
+     */
     public PropertyConditionRegistrar newPropertyCondition(Class<? extends Condition> condition, PropertyType type, String property, String owner) {
         return new PropertyConditionRegistrar(condition, type, property, owner);
     }
 
+    /**
+     * Create a new PropertyConditionRegistrar for a custom condition with property and owner.
+     *
+     * @param condition Class of the condition to register
+     * @param property  Property name
+     * @param owner     Owner of the property
+     * @return New PropertyConditionRegistrar (Don't forget to register it!)
+     */
     public PropertyConditionRegistrar newPropertyCondition(Class<? extends Condition> condition, String property, String owner) {
         return new PropertyConditionRegistrar(condition, PropertyType.BE, property, owner);
     }
 
+    /**
+     * Registrar for {@link Event Events}.
+     */
     public class EventRegistrar extends Registrar<EventRegistrar> {
-        public final Class<? extends SkriptEvent> skriptEventClass;
-        public final Class<? extends Event>[] eventClasses;
-        public final String[] patterns;
+        final Class<? extends SkriptEvent> skriptEventClass;
+        final Class<? extends Event>[] eventClasses;
+        final String[] patterns;
 
-        public EventRegistrar(Class<? extends SkriptEvent> skriptEventClass, Class<? extends Event>[] eventClass, String[] patterns) {
+        private EventRegistrar(Class<? extends SkriptEvent> skriptEventClass, Class<? extends Event>[] eventClass, String[] patterns) {
             this.skriptEventClass = skriptEventClass;
             this.eventClasses = eventClass;
             this.patterns = patterns;
@@ -442,21 +726,43 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new EventRegistrar for a custom event with patterns.
+     *
+     * @param skriptEventClass Class of the SkriptEvent to register
+     * @param eventClass       Class of the Event to register
+     * @param patterns         Patterns for the event
+     * @return New EventRegistrar (Don't forget to register it!)
+     */
     public EventRegistrar newEvent(Class<? extends SkriptEvent> skriptEventClass, Class<? extends Event> eventClass, String... patterns) {
         return new EventRegistrar(skriptEventClass, new Class[]{eventClass}, patterns);
     }
 
+    /**
+     * Create a new EventRegistrar for a custom event with multiple event classes and patterns.
+     *
+     * @param skriptEventClass Class of the SkriptEvent to register
+     * @param eventClasses     Classes of the Events to register
+     * @param patterns         Patterns for the event
+     * @return New EventRegistrar (Don't forget to register it!)
+     */
     public EventRegistrar newEvent(Class<? extends SkriptEvent> skriptEventClass, Class<? extends Event>[] eventClasses, String... patterns) {
         return new EventRegistrar(skriptEventClass, eventClasses, patterns);
     }
 
+    /**
+     * Registrar for {@link Expression Expressions}.
+     *
+     * @param <T> Return type of the expression.
+     * @param <E> Class of the Expression to register.
+     */
     public class ExpressionRegistrar<T, E extends Expression<T>> extends Registrar<ExpressionRegistrar<T, E>> {
-        public final Class<E> expressionClass;
-        public final Class<T> returnType;
-        public final Priority priority;
-        public final String[] patterns;
+        final Class<E> expressionClass;
+        final Class<T> returnType;
+        final Priority priority;
+        final String[] patterns;
 
-        public ExpressionRegistrar(Class<E> expressionClass, Class<T> returnType, Priority priority, String[] patterns) {
+        private ExpressionRegistrar(Class<E> expressionClass, Class<T> returnType, Priority priority, String[] patterns) {
             this.expressionClass = expressionClass;
             this.returnType = returnType;
             this.priority = priority;
@@ -469,33 +775,90 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new ExpressionRegistrar for a custom {@link Expression} with patterns.
+     *
+     * @param expressionClass Class of the expression to register
+     * @param returnType      Return type of the expression
+     * @param priority        Priority of the expression
+     * @param patterns        Patterns to match for the expression
+     * @param <T>             Return type of the expression
+     * @param <E>             Type of the expression
+     * @return ExpressionRegistrar for the custom expression
+     */
     public <T, E extends Expression<T>> ExpressionRegistrar<T, E> newExpression(Class<E> expressionClass, Class<T> returnType, Priority priority, String... patterns) {
         return new ExpressionRegistrar(expressionClass, returnType, priority, patterns);
     }
 
+    /**
+     * Create a new ExpressionRegistrar for a custom {@link ch.njol.skript.lang.util.SimpleExpression} with patterns.
+     *
+     * @param expressionClass Class of the expression to register
+     * @param returnType      Return type of the expression
+     * @param patterns        Patterns to match for the expression
+     * @param <T>             Return type of the expression
+     * @param <E>             Type of the expression
+     * @return ExpressionRegistrar for the custom expression
+     */
     public <T, E extends Expression<T>> ExpressionRegistrar<T, E> newSimpleExpression(Class<E> expressionClass, Class<T> returnType, String... patterns) {
         return new ExpressionRegistrar(expressionClass, returnType, SyntaxInfo.SIMPLE, patterns);
     }
 
+    /**
+     * Create a new ExpressionRegistrar for a custom {@link EventValueExpression} with patterns.
+     *
+     * @param expressionClass Class of the expression to register
+     * @param returnType      Return type of the expression
+     * @param patterns        Patterns to match for the expression
+     * @param <T>             Return type of the expression
+     * @param <E>             Type of the expression
+     * @return ExpressionRegistrar for the custom expression
+     */
     public <T, E extends Expression<T>> ExpressionRegistrar<T, E> newEventExpression(Class<E> expressionClass, Class<T> returnType, String... patterns) {
         return new ExpressionRegistrar(expressionClass, returnType, EventValueExpression.DEFAULT_PRIORITY, patterns);
     }
 
+    /**
+     * Create a new ExpressionRegistrar for a custom {@link Expression} with patterns.
+     *
+     * @param expressionClass Class of the expression to register
+     * @param returnType      Return type of the expression
+     * @param patterns        Patterns to match for the expression
+     * @param <T>             Return type of the expression
+     * @param <E>             Type of the expression
+     * @return ExpressionRegistrar for the custom expression
+     */
     public <T, E extends Expression<T>> ExpressionRegistrar<T, E> newCombinedExpression(Class<E> expressionClass, Class<T> returnType, String... patterns) {
         return new ExpressionRegistrar(expressionClass, returnType, SyntaxInfo.COMBINED, patterns);
     }
 
+    /**
+     * Create a new ExpressionRegistrar for a custom {@link SimplePropertyExpression} with patterns.
+     *
+     * @param expressionClass Class of the expression to register
+     * @param returnType      Return type of the expression
+     * @param property        Property name for the expression
+     * @param owner           Owner class for the expression
+     * @param <T>             Return type of the expression
+     * @param <E>             Type of the expression
+     * @return ExpressionRegistrar for the custom expression
+     */
     public <T, E extends Expression<T>> ExpressionRegistrar newPropertyExpression(Class<E> expressionClass, Class<T> returnType, String property, String owner) {
         return new ExpressionRegistrar(expressionClass, returnType, SyntaxInfo.SIMPLE,
             SimplePropertyExpression.getPatterns(property, owner));
     }
 
+    /**
+     * Registrar for {@link Structure Structures}.
+     *
+     * @param <E> Type of the structure
+     */
     public class StructureRegistrar<E extends Structure> extends Registrar<StructureRegistrar<E>> {
-        public final Class<E> structureClass;
-        public final String[] patterns;
-        public final EntryValidator validator;
+        final Class<E> structureClass;
+        final String[] patterns;
+        final EntryValidator validator;
 
-        public StructureRegistrar(Class<E> structureClass, EntryValidator validator, String[] patterns) {
+        private StructureRegistrar(Class<E> structureClass, EntryValidator validator, String[] patterns) {
             this.structureClass = structureClass;
             this.validator = validator;
             this.patterns = patterns;
@@ -507,18 +870,38 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new StructureRegistrar for a custom {@link Structure} with patterns.
+     *
+     * @param structureClass Class of the structure to register
+     * @param patterns       Patterns to match for the structure
+     * @return StructureRegistrar for the custom structure
+     */
     public StructureRegistrar<?> newStructure(Class<? extends Structure> structureClass, String... patterns) {
         return new StructureRegistrar<>(structureClass, null, patterns);
     }
 
+    /**
+     * Create a new StructureRegistrar for a custom {@link Structure} with patterns and validator.
+     *
+     * @param structureClass Class of the structure to register
+     * @param entryValidator Validator for structure entries
+     * @param patterns       Patterns to match for the structure
+     * @return StructureRegistrar for the custom structure
+     */
     public StructureRegistrar<?> newStructure(Class<? extends Structure> structureClass, EntryValidator entryValidator, String... patterns) {
         return new StructureRegistrar<>(structureClass, entryValidator, patterns);
     }
 
+    /**
+     * Registar for {@link ch.njol.skript.lang.function.Function Functions}.
+     *
+     * @param <T>
+     */
     public class FunctionRegistrar<T> extends Registrar<FunctionRegistrar<T>> {
-        public final DefaultFunction<T> function;
+        final DefaultFunction<T> function;
 
-        public FunctionRegistrar(DefaultFunction<T> function) {
+        private FunctionRegistrar(DefaultFunction<T> function) {
             this.function = function;
         }
 
@@ -529,21 +912,34 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new FunctionRegistrar for a custom {@link DefaultFunction Function}.
+     *
+     * @param function function to register
+     * @param <T>      return type of the function
+     * @return FunctionRegistrar for the custom function
+     */
     public <T> FunctionRegistrar<T> newFunction(DefaultFunction<T> function) {
         return new FunctionRegistrar<T>(function);
     }
 
+    /**
+     * Registrar for {@link EventValue EventValues}.
+     *
+     * @param <E> Event class type
+     * @param <T> Value class type
+     */
     public class EventValueRegistrar<E extends Event, T> extends Registrar<EventValueRegistrar<E, T>> {
-        public final Class<E> eventClass;
-        public final Class<T> valueClass;
-        public Converter<E, T> converter;
-        public String[] patterns = null;
-        public final Map<ChangeMode, EventValue.Changer<E, T>> changerMap = new HashMap<>();
-        public EventValue.Time time = EventValue.Time.NOW;
-        public Class<E>[] excludedEvents = null;
-        public String excludeErrorMessage = null;
+        final Class<E> eventClass;
+        final Class<T> valueClass;
+        Converter<E, T> converter;
+        String[] patterns = null;
+        final Map<ChangeMode, EventValue.Changer<E, T>> changerMap = new HashMap<>();
+        EventValue.Time time = EventValue.Time.NOW;
+        Class<E>[] excludedEvents = null;
+        String excludeErrorMessage = null;
 
-        public EventValueRegistrar(Class<E> eventClass, Class<T> valueClass) {
+        private EventValueRegistrar(Class<E> eventClass, Class<T> valueClass) {
             this.eventClass = eventClass;
             this.valueClass = valueClass;
         }
@@ -589,15 +985,27 @@ public class Registration {
         }
     }
 
+    /**
+     * Create a new EventValueRegistrar for a custom {@link EventValue} with event and value classes.
+     *
+     * @param event Class of the event to register
+     * @param value Class of the value to register
+     * @param <F>   Type of the event
+     * @param <T>   Type of the value
+     * @return EventValueRegistrar for the custom event value
+     */
     public <F extends Event, T> EventValueRegistrar<F, T> newEventValue(Class<F> event, Class<T> value) {
         return new EventValueRegistrar<>(event, value);
     }
 
+    /**
+     * Finalize the registration process.
+     */
     public void finalizeRegistration() {
         this.addon.loadModules(this.module);
     }
 
-    public void registerInit() {
+    private void registerInit() {
         // CHECK REGISTRATION
         this.preRegistrations.forEach(registrar -> {
             if (!registrar.isRegistered()) {
@@ -664,7 +1072,7 @@ public class Registration {
         }
     }
 
-    public void registerLoad() {
+    private void registerLoad() {
         SyntaxRegistry syntaxInfos = this.addon.syntaxRegistry();
 
         // STRUCTURES
@@ -809,12 +1217,15 @@ public class Registration {
         Utils.debug(format, args);
     }
 
+    /**
+     * @hidden
+     */
     public static class RegistrationAddonModule implements AddonModule {
 
         private final String name;
         private final Registration registration;
 
-        public RegistrationAddonModule(String name, Registration registration) {
+        private RegistrationAddonModule(String name, Registration registration) {
             this.name = name;
             this.registration = registration;
         }

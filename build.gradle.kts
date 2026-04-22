@@ -46,6 +46,18 @@ tasks {
         withJavadocJar()
         withSourcesJar()
     }
+    javadoc {
+        val options = options as StandardJavadocDocletOptions
+        options.docTitle = "SkriptRegistration API - $projectVersion"
+        options.overview = "src/main/javadoc/overview.html"
+        options.encoding = Charsets.UTF_8.name()
+        options.links(
+            "https://javadoc.io/doc/org.jetbrains/annotations/latest/",
+            "https://jd.papermc.io/paper/1.21.11/",
+            "https://docs.skriptlang.org/javadocs/",
+            "https://jd.advntr.dev/api/4.25.0/"
+        )
+    }
 }
 
 publishing {
