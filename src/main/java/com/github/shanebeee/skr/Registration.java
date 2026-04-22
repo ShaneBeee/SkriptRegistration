@@ -111,8 +111,23 @@ public class Registration {
         return this.eventValues;
     }
 
-    public List<EventValueRegistrar<?, ?>> getEventValues(Class<? extends Event> eventClass) {
-        return this.eventValuesByEvent.getOrDefault(eventClass, List.of());
+    /**
+     * Get all event values that are registered for the given event class.
+     *
+     * @param eventClass Event class to get event values for.
+     * @return List of event values.
+     */
+    public @NotNull List<EventValueRegistrar<?, ?>> getEventValues(Class<? extends Event> eventClass) {
+        if (this.eventValuesByEvent.containsKey(eventClass)) {
+            return this.eventValuesByEvent.get(eventClass);
+        }
+
+        for (Class<? extends Event> aClass : this.eventValuesByEvent.keySet()) {
+            if (aClass.isAssignableFrom(eventClass)) {
+                return this.eventValuesByEvent.get(aClass);
+            }
+        }
+        return List.of();
     }
 
     @SuppressWarnings("unchecked")
