@@ -1115,6 +1115,15 @@ public class Registration {
             if (type.changer != null) {
                 classInfo.changer(type.changer);
             }
+            if (Classes.getClassInfo(type.codename) != null) {
+                skriptError("ClassInfo with code name '%s' is already registered!", type.codename);
+                skriptError("You may need to use that addon's '%s' type with %s's syntaxes.", type.type.getName(), this.addon.name());
+                continue;
+            } else if (Classes.getExactClassInfo(type.type) != null) {
+                skriptError("ClassInfo with type '%s' is already registered!", type.type);
+                skriptError("You may need to use that addon's '%s' type with %s's syntaxes.", type.type.getName(), this.addon.name());
+                continue;
+            }
             Classes.registerClass(classInfo);
         }
     }
