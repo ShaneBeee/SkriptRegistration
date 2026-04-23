@@ -14,6 +14,7 @@ import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.lang.eventvalue.EventValue;
+import org.skriptlang.skript.bukkit.lang.eventvalue.EventValueRegistry;
 import org.skriptlang.skript.common.function.DefaultFunction;
 import org.skriptlang.skript.common.function.Parameter;
 import org.skriptlang.skript.lang.entry.EntryData;
@@ -191,38 +192,14 @@ public class JsonDocGenerator {
 
             for (Class<? extends Event> eventClass : event.eventClasses) {
                 for (Registration.EventValueRegistrar<?, ?> eventValueInfo : this.registration.getEventValues(eventClass)) {
-                    Class<?> valueClass = eventValueInfo.valueClass;
-                    boolean isArray = valueClass.isArray();
-                    if (isArray) {
-                        valueClass = valueClass.getComponentType();
-                    }
-                    ClassInfo<?> valueClassInfo = Classes.getExactClassInfo(valueClass);
-                    if (valueClassInfo == null) continue;
+                    addEventValue(eventValueList, eventValueInfo, description);
+                }
+                EventValueRegistry eventValueRegistry = this.registration.getAddon().registry(EventValueRegistry.class);
+                for (EventValue<?, ?> element : eventValueRegistry.elements()) {
+                    if (!element.eventClass().isAssignableFrom(eventClass)) continue;
 
-                    Noun classInfoName = valueClassInfo.getName();
-                    String infoName = eventValueInfo.patterns != null ? eventValueInfo.patterns[0] : isArray ? classInfoName.getPlural() : classInfoName.getSingular();
-                    EventValue.Time time = eventValueInfo.time;
-                    String timeString = switch (time) {
-                        case NOW -> "event-";
-                        case FUTURE -> "future event-";
-                        case PAST -> "past event-";
-                    };
-
-                    String eventValueString = timeString + infoName;
-                    if (!eventValueList.contains(eventValueString)) {
-                        eventValueList.add(eventValueString);
-                    }
-                    description.add(" - `" + eventValueString + "`");
-                    if (eventValueInfo.getDocumentation().getDescription() != null) {
-                        description.add("   - **Description**: " + String.join(" ", eventValueInfo.getDocumentation().getDescription()));
-                    }
-                    if (eventValueInfo.patterns != null && eventValueInfo.patterns.length > 1) {
-                        description.add("   - **Patterns**: `" + timeString + String.join("`, `" + timeString, eventValueInfo.patterns) + "`");
-                    }
-                    Map<ChangeMode, ? extends EventValue.Changer<?, ?>> changerMap = eventValueInfo.changerMap;
-                    if (!changerMap.isEmpty()) {
-                        description.add("   - **Changers**: " + String.join(", ", changerMap.keySet().stream().map(Enum::name).toList()));
-                    }
+                    Registration.EventValueRegistrar<?, ?> info = this.registration.eventValueFromSkriptEventValue(element);
+                    addEventValue(eventValueList, info, description);
                 }
             }
             if (!eventValueList.isEmpty()) {
@@ -240,6 +217,42 @@ public class JsonDocGenerator {
         this.total += eventsArray.size();
         Utils.log("Generated %s events", eventsArray.size());
         mainDoc.add("events", eventsArray);
+    }
+
+    private void addEventValue(List<String> eventValueList, Registration.EventValueRegistrar<?, ?> eventValueInfo, JsonArray description) {
+        Class<?> valueClass = eventValueInfo.valueClass;
+        boolean isArray = valueClass.isArray();
+        if (isArray) {
+            valueClass = valueClass.getComponentType();
+        }
+        ClassInfo<?> valueClassInfo = Classes.getExactClassInfo(valueClass);
+        if (valueClassInfo == null) return;
+
+        Noun classInfoName = valueClassInfo.getName();
+        String infoName = eventValueInfo.patterns != null && eventValueInfo.patterns.length > 0 ? eventValueInfo.patterns[0] : isArray ? classInfoName.getPlural() : classInfoName.getSingular();
+        EventValue.Time time = eventValueInfo.time;
+        String timeString = switch (time) {
+            case NOW -> "event-";
+            case FUTURE -> "future event-";
+            case PAST -> "past event-";
+        };
+
+        String eventValueString = timeString + infoName;
+        if (eventValueList.contains(eventValueString)) {
+            return;
+        }
+        eventValueList.add(eventValueString);
+        description.add(" - `" + eventValueString + "`");
+        if (eventValueInfo.getDocumentation().getDescription() != null) {
+            description.add("   - **Description**: " + String.join(" ", eventValueInfo.getDocumentation().getDescription()));
+        }
+        if (eventValueInfo.patterns != null && eventValueInfo.patterns.length > 1) {
+            description.add("   - **Patterns**: `" + timeString + String.join("`, `" + timeString, eventValueInfo.patterns) + "`");
+        }
+        Map<ChangeMode, ? extends EventValue.Changer<?, ?>> changerMap = eventValueInfo.changerMap;
+        if (!changerMap.isEmpty()) {
+            description.add("   - **Changers**: " + String.join(", ", changerMap.keySet().stream().map(Enum::name).toList()));
+        }
     }
 
     private void generateSections(JsonObject mainDoc) {
