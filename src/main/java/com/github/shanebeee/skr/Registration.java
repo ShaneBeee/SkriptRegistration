@@ -976,6 +976,7 @@ public class Registration {
      * @param <E> Event class type
      * @param <T> Value class type
      */
+    @SuppressWarnings("UnusedReturnValue")
     public class EventValueRegistrar<E extends Event, T> extends Registrar<EventValueRegistrar<E, T>> {
         final Class<E> eventClass;
         final Class<T> valueClass;
@@ -1030,6 +1031,17 @@ public class Registration {
                 .add(this);
             Registration.this.eventValues.add(this);
         }
+    }
+
+    <F extends Event, T> EventValueRegistrar<F, T> eventValueFromSkriptEventValue(EventValue<F, T> eventValue) {
+        EventValueRegistrar<F, T> registrar = new EventValueRegistrar<>(eventValue.eventClass(), eventValue.valueClass());
+        registrar.converter(eventValue.converter());
+        registrar.patterns(eventValue.patterns().toArray(new String[0]));
+        for (ChangeMode value : ChangeMode.values()) {
+            eventValue.changer(value).ifPresent(changer -> registrar.changer(value, changer));
+        }
+        registrar.time(eventValue.time());
+        return registrar;
     }
 
     /**
@@ -1115,7 +1127,7 @@ public class Registration {
             if (type.changer != null) {
                 classInfo.changer(type.changer);
             }
-            if (Classes.getClassInfo(type.codename) != null) {
+            if (Classes.getClassInfoNoError(type.codename) != null) {
                 skriptError("ClassInfo with code name '%s' is already registered!", type.codename);
                 skriptError("You may need to use that addon's '%s' type with %s's syntaxes.", type.type.getName(), this.addon.name());
                 continue;
