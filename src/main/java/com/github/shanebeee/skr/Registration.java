@@ -1097,6 +1097,9 @@ public class Registration {
             } else {
                 classInfo = new ClassInfo<>(type.type, type.codename);
             }
+            if (type.getDocumentation().getName() != null) {
+                classInfo.name(type.getDocumentation().getName());
+            }
             if (type.user != null) {
                 classInfo.user(type.user);
             }
