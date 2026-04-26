@@ -80,6 +80,7 @@ public class Registration {
             this.addon.localizer().setSourceDirectories("lang", null);
         }
         this.module = new RegistrationAddonModule(name, this);
+        Utils.setPrefix("<gradient:#19C5E7:#17E9B6>" + name + "</gradient>");
     }
 
     /**
