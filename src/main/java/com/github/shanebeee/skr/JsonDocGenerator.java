@@ -214,7 +214,7 @@ public class JsonDocGenerator {
         if (isArray) {
             valueClass = valueClass.getComponentType();
         }
-        ClassInfo<?> valueClassInfo = Classes.getExactClassInfo(valueClass);
+        ClassInfo<?> valueClassInfo = Classes.getSuperClassInfo(valueClass);
         if (valueClassInfo == null) return;
 
         Noun classInfoName = valueClassInfo.getName();
