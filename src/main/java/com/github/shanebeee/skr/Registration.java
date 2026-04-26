@@ -624,10 +624,16 @@ public class Registration {
     public class EffectRegistrar extends Registrar<EffectRegistrar> {
         final Class<? extends Effect> effect;
         final String[] patterns;
+        @Nullable EntryValidator validator;
 
         private EffectRegistrar(Class<? extends Effect> effect, String[] patterns) {
             this.effect = effect;
             this.patterns = patterns;
+        }
+
+        public EffectRegistrar validator(EntryValidator validator) {
+            this.validator = validator;
+            return this;
         }
 
         public void register() {
@@ -808,12 +814,18 @@ public class Registration {
         final Class<T> returnType;
         final Priority priority;
         final String[] patterns;
+        @Nullable EntryValidator validator;
 
         private ExpressionRegistrar(Class<E> expressionClass, Class<T> returnType, Priority priority, String[] patterns) {
             this.expressionClass = expressionClass;
             this.returnType = returnType;
             this.priority = priority;
             this.patterns = patterns;
+        }
+
+        public ExpressionRegistrar<T, E> validator(EntryValidator validator) {
+            this.validator = validator;
+            return this;
         }
 
         public void register() {

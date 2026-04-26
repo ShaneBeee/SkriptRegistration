@@ -99,7 +99,7 @@ public class JsonDocGenerator {
                     .replaceAll("(.)\\?", "[$1]");
                 patterns.add(usage);
             }
-            gemerateGeneric("type", documentation, syntaxObject, patterns.toArray(new String[0]));
+            generateGeneric("type", documentation, syntaxObject, patterns.toArray(new String[0]));
 
             // Usage
             if (type.usage != null) {
@@ -128,21 +128,10 @@ public class JsonDocGenerator {
             }
 
             // Generic
-            gemerateGeneric("structure", documentation, syntaxObject, structure.patterns);
+            generateGeneric("structure", documentation, syntaxObject, structure.patterns);
 
-            // Entires
-            EntryValidator validator = structure.validator;
-            if (validator != null) {
-                JsonArray entriesArray = new JsonArray();
-                for (EntryData<?> entryDatum : validator.getEntryData()) {
-                    JsonObject entryObject = new JsonObject();
-                    entryObject.addProperty("name", entryDatum.getKey());
-                    entryObject.addProperty("isRequired", !entryDatum.isOptional());
-                    entryObject.addProperty("isSection", SectionEntryData.class.isAssignableFrom(entryDatum.getClass()));
-                    entriesArray.add(entryObject);
-                }
-                syntaxObject.add("entries", entriesArray);
-            }
+            // Entries
+            generateSectionEntries(structure.validator, syntaxObject);
 
             structuresArray.add(syntaxObject);
         }
@@ -172,7 +161,7 @@ public class JsonDocGenerator {
             for (String pattern : event.patterns) {
                 patterns.add("[on] " + pattern);
             }
-            gemerateGeneric("event", documentation, syntaxObject, patterns.toArray(new String[0]));
+            generateGeneric("event", documentation, syntaxObject, patterns.toArray(new String[0]));
 
             // Cancelable
             boolean cancellable = false;
@@ -271,21 +260,10 @@ public class JsonDocGenerator {
             }
 
             // Generic
-            gemerateGeneric("section", documentation, syntaxObject, section.patterns);
+            generateGeneric("section", documentation, syntaxObject, section.patterns);
 
-            // Entires
-            EntryValidator validator = section.validator;
-            if (validator != null) {
-                JsonArray entriesArray = new JsonArray();
-                for (EntryData<?> entryDatum : validator.getEntryData()) {
-                    JsonObject entryObject = new JsonObject();
-                    entryObject.addProperty("name", entryDatum.getKey());
-                    entryObject.addProperty("isRequired", !entryDatum.isOptional());
-                    entryObject.addProperty("isSection", SectionEntryData.class.isAssignableFrom(entryDatum.getClass()));
-                    entriesArray.add(entryObject);
-                }
-                syntaxObject.add("entries", entriesArray);
-            }
+            // Entries
+            generateSectionEntries(section.validator, syntaxObject);
 
             sectionsArray.add(syntaxObject);
         }
@@ -311,7 +289,10 @@ public class JsonDocGenerator {
             }
 
             // Generic
-            gemerateGeneric("effect", documentation, syntaxObject, effect.patterns);
+            generateGeneric("effect", documentation, syntaxObject, effect.patterns);
+
+            // Entries (If it's a section effect)
+            generateSectionEntries(effect.validator, syntaxObject);
 
             effectsArray.add(syntaxObject);
         }
@@ -338,7 +319,10 @@ public class JsonDocGenerator {
             }
 
             // Generic
-            gemerateGeneric("expression", documentation, syntaxObject, expression.patterns);
+            generateGeneric("expression", documentation, syntaxObject, expression.patterns);
+
+            // Entries (If it's a section expression)
+            generateSectionEntries(expression.validator, syntaxObject);
 
             // Return Type
             ClassInfo<?> returnInfo = Classes.getExactClassInfo(expression.returnType);
@@ -384,7 +368,7 @@ public class JsonDocGenerator {
             }
 
             // Generic
-            gemerateGeneric("condition", documentation, syntaxObject, condition.patterns);
+            generateGeneric("condition", documentation, syntaxObject, condition.patterns);
 
             conditonsArray.add(syntaxObject);
         }
@@ -411,7 +395,7 @@ public class JsonDocGenerator {
 
             // Generic
             String pattern = generateFunctionPattern(function.function);
-            gemerateGeneric("function", documentation, syntaxObject, new String[]{pattern}, false);
+            generateGeneric("function", documentation, syntaxObject, new String[]{pattern}, false);
 
             // Return Type
             ClassInfo<?> returnInfo = Classes.getExactClassInfo(function.function.signature().returnType());
@@ -433,12 +417,25 @@ public class JsonDocGenerator {
         mainDoc.add("metadata", meta);
     }
 
-    private void gemerateGeneric(String type, Documentation documentation,
-                                 JsonObject syntaxObject, @Nullable String[] patterns) {
-        gemerateGeneric(type, documentation, syntaxObject, patterns, true);
+    private void generateSectionEntries(EntryValidator validator, JsonObject syntaxObject) {
+        if (validator == null) return;
+        JsonArray entriesArray = new JsonArray();
+        for (EntryData<?> entryDatum : validator.getEntryData()) {
+            JsonObject entryObject = new JsonObject();
+            entryObject.addProperty("name", entryDatum.getKey());
+            entryObject.addProperty("isRequired", !entryDatum.isOptional());
+            entryObject.addProperty("isSection", SectionEntryData.class.isAssignableFrom(entryDatum.getClass()));
+            entriesArray.add(entryObject);
+        }
+        syntaxObject.add("entries", entriesArray);
     }
 
-    private void gemerateGeneric(String type, Documentation documentation, JsonObject syntaxObject,
+    private void generateGeneric(String type, Documentation documentation,
+                                 JsonObject syntaxObject, @Nullable String[] patterns) {
+        generateGeneric(type, documentation, syntaxObject, patterns, true);
+    }
+
+    private void generateGeneric(String type, Documentation documentation, JsonObject syntaxObject,
                                  @Nullable String[] patterns, boolean removeParseMarks) {
         // Generate ID
         String id = generateId(type, documentation.getName());
