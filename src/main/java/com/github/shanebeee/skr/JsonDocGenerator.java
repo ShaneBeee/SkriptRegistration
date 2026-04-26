@@ -306,7 +306,7 @@ public class JsonDocGenerator {
         Utils.log("Generating expressions...");
         JsonArray expressionsArray = new JsonArray();
 
-        Utils.log("&eChecking changers, ignore incoming errors from Expression classes");
+        Utils.log("<#E40CF0>Checking changers, ignore incoming errors from Expression classes");
         for (Registration.ExpressionRegistrar<?, ?> expression : this.registration.getExpressions()) {
             JsonObject syntaxObject = new JsonObject();
 
@@ -346,6 +346,7 @@ public class JsonDocGenerator {
 
             expressionsArray.add(syntaxObject);
         }
+        Utils.log("<#E40CF0>Finished checking changers, resume watching console");
 
         this.total += expressionsArray.size();
         Utils.log("Generated %s expressions.", expressionsArray.size());
