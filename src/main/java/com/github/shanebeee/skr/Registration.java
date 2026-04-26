@@ -293,7 +293,7 @@ public class Registration {
          */
         public void register() {
             if (this.registered) {
-                skriptError("Syntax '%s' is already registered!", this.documentation.getName());
+                error("Syntax '%s' is already registered!", this.documentation.getName());
                 return;
             }
             this.registered = true;
@@ -1091,9 +1091,9 @@ public class Registration {
                     }
                 }
                 if (name == null) {
-                    skriptError("Unnamed registrar in '%s' not registered!", name);
+                    error("Unnamed registrar in '%s' not registered!", name);
                 } else {
-                    skriptError("Registrar for '%s' in '%s' not registered!", name, registrarName);
+                    error("Registrar for '%s' in '%s' not registered!", name, registrarName);
                 }
             }
         });
@@ -1143,12 +1143,12 @@ public class Registration {
                 classInfo.changer(type.changer);
             }
             if (Classes.getClassInfoNoError(type.codename) != null) {
-                skriptError("ClassInfo with code name '%s' is already registered!", type.codename);
-                skriptError("You may need to use that addon's '%s' type with %s's syntaxes.", type.type.getName(), this.addon.name());
+                error("ClassInfo with code name '%s' is already registered!", type.codename);
+                error("You may need to use that addon's '%s' type with %s's syntaxes.", type.type.getName(), this.addon.name());
                 continue;
             } else if (Classes.getExactClassInfo(type.type) != null) {
-                skriptError("ClassInfo with type '%s' is already registered!", type.type);
-                skriptError("You may need to use that addon's '%s' type with %s's syntaxes.", type.type.getName(), this.addon.name());
+                error("ClassInfo with type '%s' is already registered!", type.type);
+                error("You may need to use that addon's '%s' type with %s's syntaxes.", type.type.getName(), this.addon.name());
                 continue;
             }
             Classes.registerClass(classInfo);
@@ -1291,8 +1291,8 @@ public class Registration {
         }
     }
 
-    private static void skriptError(String format, Object... args) {
-        Utils.skriptError(format, args);
+    private static void error(String format, Object... args) {
+        Utils.error(format, args);
     }
 
     @SuppressWarnings("SameParameterValue")

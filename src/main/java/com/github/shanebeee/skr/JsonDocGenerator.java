@@ -87,7 +87,7 @@ public class JsonDocGenerator {
             if (documentation.isNoDoc()) continue;
 
             if (documentation.getName() == null) {
-                Utils.log("&cMissing name for Type '%s'", type.type.getSimpleName());
+                Utils.log("<red>Missing name for Type '%s'", type.type.getSimpleName());
                 continue;
             }
 
@@ -123,7 +123,7 @@ public class JsonDocGenerator {
             if (documentation.isNoDoc()) continue;
 
             if (documentation.getName() == null) {
-                Utils.log("&cMissing name for Structure '%s'", structure.structureClass.getSimpleName());
+                Utils.log("<red>Missing name for Structure '%s'", structure.structureClass.getSimpleName());
                 continue;
             }
 
@@ -152,7 +152,7 @@ public class JsonDocGenerator {
             if (documentation.isNoDoc()) continue;
 
             if (documentation.getName() == null) {
-                Utils.log("&cMissing name for Type '%s'", event.skriptEventClass.getSimpleName());
+                Utils.log("<red>Missing name for Type '%s'", event.skriptEventClass.getSimpleName());
                 continue;
             }
 
@@ -255,7 +255,7 @@ public class JsonDocGenerator {
             if (documentation.isNoDoc()) continue;
 
             if (documentation.getName() == null) {
-                Utils.log("&cMissing name for Section '%s'", section.section.getSimpleName());
+                Utils.log("<red>Missing name for Section '%s'", section.section.getSimpleName());
                 continue;
             }
 
@@ -284,7 +284,7 @@ public class JsonDocGenerator {
             if (documentation.isNoDoc()) continue;
 
             if (documentation.getName() == null) {
-                Utils.log("&cMissing name for Effect '%s'", effect.effect.getSimpleName());
+                Utils.log("<red>Missing name for Effect '%s'", effect.effect.getSimpleName());
                 continue;
             }
 
@@ -314,7 +314,7 @@ public class JsonDocGenerator {
             if (documentation.isNoDoc()) continue;
 
             if (documentation.getName() == null) {
-                Utils.log("&cMissing name for Expression '%s'", expression.expressionClass.getSimpleName());
+                Utils.log("<red>Missing name for Expression '%s'", expression.expressionClass.getSimpleName());
                 continue;
             }
 
@@ -347,6 +347,7 @@ public class JsonDocGenerator {
             expressionsArray.add(syntaxObject);
         }
         Utils.log("<#E40CF0>Finished checking changers, resume watching console");
+        Utils.error("Test error");
 
         this.total += expressionsArray.size();
         Utils.log("Generated %s expressions.", expressionsArray.size());
@@ -364,7 +365,7 @@ public class JsonDocGenerator {
             if (documentation.isNoDoc()) continue;
 
             if (documentation.getName() == null) {
-                Utils.log("&cMissing name for Condition '%s'", condition.condition.getSimpleName());
+                Utils.log("<red>Missing name for Condition '%s'", condition.condition.getSimpleName());
                 continue;
             }
 
@@ -475,7 +476,7 @@ public class JsonDocGenerator {
             }
             syntaxObject.add("since", sinceArray);
         } else {
-            Utils.log("&cMissing 'since' for '%s'", name);
+            Utils.log("<red>Missing 'since' for '%s'", name);
         }
 
         if (patterns != null) {
@@ -492,7 +493,7 @@ public class JsonDocGenerator {
         name = name.toLowerCase(Locale.ROOT).replace(" ", "_");
         String id = String.format("%s:%s:%s", this.addonName, type, name);
         if (this.IDS.contains(id)) {
-            Utils.log("&cID '%s' already exists", id);
+            Utils.log("<red>ID '%s' already exists", id);
         }
         this.IDS.add(id);
         return id;
@@ -534,14 +535,14 @@ public class JsonDocGenerator {
         File dataFolder = this.plugin.getDataFolder();
         if (!dataFolder.exists()) {
             if (!dataFolder.mkdirs()) {
-                Utils.log("&cFailed to create data folder");
+                Utils.log("<red>Failed to create data folder");
                 return;
             }
         }
         File file = new File(dataFolder, "json-docs.json");
         try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(jsonElement, writer);
-            Utils.log("&aSuccessfully wrote JSON element to 'json-docs.json'");
+            Utils.log("<green>Successfully wrote JSON element to 'json-docs.json'");
         } catch (IOException e) {
             e.printStackTrace();
         }
