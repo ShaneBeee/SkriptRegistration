@@ -10,7 +10,7 @@ configurations.matching { it.isCanBeResolved }.configureEach {
 }
 
 // Version of SkriptRegistration
-val projectVersion = "1.0.10"
+val projectVersion = "1.0.11"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 
@@ -63,7 +63,7 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.github.shanebeee"
+            groupId = "com.github.ShaneBeee"
             artifactId = "SkriptRegistration"
             version = projectVersion
 

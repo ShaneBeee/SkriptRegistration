@@ -1,4 +1,4 @@
-package com.github.shanebeee.skr;
+package com.github.shanebeee.skr.skript;
 
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;
@@ -6,6 +6,7 @@ import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.util.StringUtils;
 import ch.njol.yggdrasil.Fields;
+import com.github.shanebeee.skr.Utils;
 import com.google.common.base.Preconditions;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;

@@ -1,4 +1,4 @@
-package com.github.shanebeee.skr;
+package com.github.shanebeee.skr.skript;
 
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;

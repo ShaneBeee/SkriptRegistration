@@ -19,6 +19,8 @@ import ch.njol.skript.lang.Section;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.registrations.Classes;
+import com.github.shanebeee.skr.skript.EnumWrapper;
+import com.github.shanebeee.skr.skript.RegistryClassInfo;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.Keyed;
