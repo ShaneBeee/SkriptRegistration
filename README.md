@@ -20,7 +20,7 @@ dependencies {
 ```
 
 ## Shading:
-It is highly recommended you shade the library to avoid conflicts with other addons that may use this.
+It is highly recommended that you relocate the library when shading to avoid conflicts with other addons that may use SKR.
 ```kts
 tasks {
     shadowJar {
