@@ -465,7 +465,7 @@ public class Registration {
     }
 
     /**
-     * Create a new @link EnumTypeRegistrar} for a custom {@link EnumWrapper EnumClassInfo} with a custom prefix and suffix.
+     * Create a new {@link EnumTypeRegistrar} for a custom {@link EnumWrapper EnumClassInfo} with a custom prefix and suffix.
      *
      * @param type     Class to register
      * @param codename Codename of new type
