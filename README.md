@@ -1,3 +1,6 @@
+SkriptRegistration (or SKR for short) is a simplified version of Skript's syntax registry.  
+It enables Skript addons to easily register syntaxes without having to deal with the complexities of Skript's syntax registry.  
+SKR also plans to provide as much backwards compatability as possible, but you never know, things might just have to change.
 
 ## Usage:
 Until I have time to write a proper usage guide, please refer to [**SkBee**](https://github.com/ShaneBeee/SkBee) to see how this library is used.
@@ -25,6 +28,9 @@ tasks {
     }
 }
 ```
+
+## Javadocs:
+Check out SKR's [**Javadocs**](https://shanebeee.github.io/docs/SkriptRegistration/).
 
 ## License:
 SkriptRegistration is licensed under the [**GPL-3 License**](https://github.com/ShaneBeee/SkriptRegistration/blob/master/LICENSE).
