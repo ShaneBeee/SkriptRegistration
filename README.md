@@ -29,6 +29,9 @@ tasks {
 }
 ```
 
+## Setup:
+See the [**Wiki**](https://github.com/ShaneBeee/SkriptRegistration/wiki) for setup/usage instructions.
+
 ## Javadocs:
 Check out SKR's [**Javadocs**](https://shanebeee.github.io/docs/SkriptRegistration/latest/).
 
