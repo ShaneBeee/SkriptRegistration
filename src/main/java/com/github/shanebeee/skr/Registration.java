@@ -1089,12 +1089,10 @@ public class Registration {
                     // Try to find a name
                     if (registrar instanceof EventValueRegistrar<?, ?> evr) {
                         name = evr.eventClass.getSimpleName() + " " + evr.valueClass.getSimpleName();
-                    } else {
-                        name = registrarName;
                     }
                 }
                 if (name == null) {
-                    error("Unnamed registrar in '%s' not registered!", name);
+                    error("Unnamed registrar in '%s' not registered!", registrarName);
                 } else {
                     error("Registrar for '%s' in '%s' not registered!", name, registrarName);
                 }
