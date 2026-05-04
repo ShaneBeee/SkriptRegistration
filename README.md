@@ -30,7 +30,7 @@ tasks {
 ```
 
 ## Javadocs:
-Check out SKR's [**Javadocs**](https://shanebeee.github.io/docs/SkriptRegistration/).
+Check out SKR's [**Javadocs**](https://shanebeee.github.io/docs/SkriptRegistration/latest/).
 
 ## License:
 SkriptRegistration is licensed under the [**GPL-3 License**](https://github.com/ShaneBeee/SkriptRegistration/blob/master/LICENSE).
