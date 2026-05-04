@@ -9,6 +9,7 @@ package com.github.shanebeee.skr;
 public class Documentation {
 
     private boolean noDoc;
+    private String id;
     private String name;
     private String[] description;
     private String[] examples;
@@ -26,6 +27,14 @@ public class Documentation {
      */
     public boolean isNoDoc() {
         return noDoc;
+    }
+
+    void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return this.id;
     }
 
     void setName(String name) {

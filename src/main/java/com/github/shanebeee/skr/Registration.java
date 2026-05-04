@@ -219,6 +219,21 @@ public class Registration {
         }
 
         /**
+         * Set a doc override ID.
+         * <p>
+         * By default, docs will id as {@code <addon_name:type:syntax_name>}.
+         * This method will override the default ID.
+         * </p>
+         *
+         * @param id ID to override
+         * @return This registrar for chaining.
+         */
+        public T docIdOverride(String id) {
+            this.documentation.setId(id);
+            return (T) this;
+        }
+
+        /**
          * The documentation name of this syntax.
          *
          * @param name The name of this syntax.

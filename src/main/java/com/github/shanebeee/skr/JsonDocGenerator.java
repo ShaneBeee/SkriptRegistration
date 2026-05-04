@@ -440,7 +440,12 @@ public class JsonDocGenerator {
     private void generateGeneric(String type, Documentation documentation, JsonObject syntaxObject,
                                  @Nullable String[] patterns, boolean removeParseMarks) {
         // Generate ID
-        String id = generateId(type, documentation.getName());
+        String id;
+        if (documentation.getId() != null) {
+            id = documentation.getId();
+        } else {
+            id = generateId(type, documentation.getName());
+        }
         syntaxObject.addProperty("id", id);
 
         // Name
