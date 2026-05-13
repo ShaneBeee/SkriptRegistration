@@ -87,7 +87,7 @@ public class JsonDocGenerator {
             if (documentation.isNoDoc()) continue;
 
             if (documentation.getName() == null) {
-                Utils.log("<red>Missing name for Type '%s'", type.type.getSimpleName());
+                Utils.log("<red>Missing name for Type '%s'", type.classInfo.getClass().getSimpleName());
                 continue;
             }
 
@@ -102,8 +102,8 @@ public class JsonDocGenerator {
             generateGeneric("type", documentation, syntaxObject, patterns.toArray(new String[0]));
 
             // Usage
-            if (type.usage != null) {
-                syntaxObject.addProperty("usage", type.usage);
+            if (type.classInfo.getUsage() != null) {
+                syntaxObject.addProperty("usage", String.join(", ", type.classInfo.getUsage()));
             }
 
             typesArray.add(syntaxObject);
