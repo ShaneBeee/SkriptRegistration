@@ -10,7 +10,7 @@ configurations.matching { it.isCanBeResolved }.configureEach {
 }
 
 // Version of SkriptRegistration
-val projectVersion = "1.4.0"
+val projectVersion = "1.4.1"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 

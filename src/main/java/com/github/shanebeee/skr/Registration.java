@@ -552,10 +552,6 @@ public class Registration {
             this.createUsage = createUsage;
 
             this.classInfo = RegistryClassInfo.create(registry, type, createUsage, codename, prefix, suffix);
-            @Nullable String[] classInfoUsage = this.classInfo.getUsage();
-            if (classInfoUsage != null) {
-                this.usage(String.join(", ", classInfoUsage));
-            }
         }
     }
 
