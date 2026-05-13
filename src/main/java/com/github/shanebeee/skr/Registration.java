@@ -1111,9 +1111,9 @@ public class Registration {
                 error("ClassInfo with code name '%s' is already registered!", classInfo.getCodeName());
                 error("You may need to use that addon's '%s' type with %s's syntaxes.", classInfo.getClass().getName(), this.addon.name());
                 continue;
-            } else if (Classes.getExactClassInfo(classInfo.getClass()) != null) {
-                error("ClassInfo with type '%s' is already registered!", classInfo.getClass());
-                error("You may need to use that addon's '%s' type with %s's syntaxes.", classInfo.getClass().getName(), this.addon.name());
+            } else if (Classes.getExactClassInfo(classInfo.getC()) != null) {
+                error("ClassInfo with type '%s' is already registered!", classInfo.getC());
+                error("You may need to use that addon's '%s' type with %s's syntaxes.", classInfo.getC().getName(), this.addon.name());
                 continue;
             }
 
