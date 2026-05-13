@@ -20,11 +20,13 @@ import org.skriptlang.skript.common.function.Parameter;
 import org.skriptlang.skript.lang.entry.EntryData;
 import org.skriptlang.skript.lang.entry.EntryValidator;
 import org.skriptlang.skript.lang.entry.SectionEntryData;
+import org.skriptlang.skript.lang.properties.Property;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -33,7 +35,7 @@ import java.util.Map;
 /**
  * Generator for JSON documentation for Skript addons.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnstableApiUsage"})
 public class JsonDocGenerator {
 
     private final Plugin plugin;
@@ -81,13 +83,14 @@ public class JsonDocGenerator {
         JsonArray typesArray = new JsonArray();
 
         for (Registration.TypeRegistrar<?> type : this.registration.getTypes()) {
+            ClassInfo<?> classInfo = type.classInfo;
             JsonObject syntaxObject = new JsonObject();
 
             Documentation documentation = type.getDocumentation();
             if (documentation.isNoDoc()) continue;
 
             if (documentation.getName() == null) {
-                Utils.log("<red>Missing name for Type '%s'", type.type.getSimpleName());
+                Utils.log("<red>Missing name for Type '%s'", classInfo.getClass().getSimpleName());
                 continue;
             }
 
@@ -102,8 +105,20 @@ public class JsonDocGenerator {
             generateGeneric("type", documentation, syntaxObject, patterns.toArray(new String[0]));
 
             // Usage
-            if (type.usage != null) {
-                syntaxObject.addProperty("usage", type.usage);
+            if (classInfo.getUsage() != null) {
+                syntaxObject.addProperty("usage", String.join(", ", classInfo.getUsage()));
+            }
+
+            // Properties
+            Collection<Property<?>> properties = classInfo.getAllProperties();
+            if (!properties.isEmpty()) {
+                JsonArray description = syntaxObject.getAsJsonArray("description");
+                description.add(" ");
+                description.add("**Properties:**");
+                for (Property<?> property : properties) {
+                    ClassInfo.PropertyDocs propertyDoc = classInfo.getPropertyDocumentation(property);
+                    description.add(" - `" + property.name() + "` = " + propertyDoc.description());
+                }
             }
 
             typesArray.add(syntaxObject);

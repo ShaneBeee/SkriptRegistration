@@ -36,6 +36,8 @@ import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
 import org.skriptlang.skript.common.function.DefaultFunction;
 import org.skriptlang.skript.lang.converter.Converter;
 import org.skriptlang.skript.lang.entry.EntryValidator;
+import org.skriptlang.skript.lang.properties.Property;
+import org.skriptlang.skript.lang.properties.handlers.base.PropertyHandler;
 import org.skriptlang.skript.lang.structure.Structure;
 import org.skriptlang.skript.registration.DefaultSyntaxInfos;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -323,72 +325,82 @@ public class Registration {
      *
      * @param <T> Type of class to register.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public class TypeRegistrar<T> extends Registrar<TypeRegistrar<T>> {
-        final Class<T> type;
-        final String codename;
+        ClassInfo<T> classInfo;
         String[] user;
-        String[] after;
-        String[] before;
-        String usage;
-        DefaultExpression<T> defaultExpression;
-        @Nullable Supplier<Iterator<T>> supplier;
-        Parser<? extends T> parser;
-        Serializer<? super T> serializer;
-        Cloner<T> cloner;
-        Changer<? super T> changer;
 
         private TypeRegistrar(Class<T> type, String codename) {
-            this.type = type;
-            this.codename = codename;
+            this.classInfo = new ClassInfo<>(type, codename);
         }
 
         public TypeRegistrar<T> user(String... user) {
+            this.classInfo.user(user);
             this.user = user;
             return this;
         }
 
         public TypeRegistrar<T> after(String... after) {
-            this.after = after;
+            this.classInfo.after(after);
             return this;
         }
 
         public TypeRegistrar<T> before(String... before) {
-            this.before = before;
+            this.classInfo.before(before);
             return this;
         }
 
         public TypeRegistrar<T> usage(String usage) {
-            this.usage = usage;
+            this.classInfo.usage(usage);
             return this;
         }
 
         public TypeRegistrar<T> defaultExpression(DefaultExpression<T> defaultExpression) {
-            this.defaultExpression = defaultExpression;
+            this.classInfo.defaultExpression(defaultExpression);
             return this;
         }
 
         public TypeRegistrar<T> supplier(Supplier<Iterator<T>> supplier) {
-            this.supplier = supplier;
+            this.classInfo.supplier(supplier);
             return this;
         }
 
         public TypeRegistrar<T> parser(Parser<? extends T> parser) {
-            this.parser = parser;
+            this.classInfo.parser(parser);
             return this;
         }
 
         public TypeRegistrar<T> serializer(Serializer<? super T> serializer) {
-            this.serializer = serializer;
+            this.classInfo.serializer(serializer);
             return this;
         }
 
         public TypeRegistrar<T> cloner(Cloner<T> cloner) {
-            this.cloner = cloner;
+            this.classInfo.cloner(cloner);
             return this;
         }
 
         public TypeRegistrar<T> changer(Changer<? super T> changer) {
-            this.changer = changer;
+            this.classInfo.changer(changer);
+            return this;
+        }
+
+        /**
+         * Registers this class as having the given property, using the given property handler.
+         * <p>Copied from {@link ClassInfo}</p>
+         *
+         * @param property    The property this class should have
+         * @param description A short description of the property for documentation
+         * @param handler     The handler for this property
+         * @param <Handler>   The type of the property handler
+         * @return This Type registrar
+         * @throws IllegalStateException If this property is already registered for this class
+         */
+        @SuppressWarnings({"UnstableApiUsage"})
+        public <Handler extends PropertyHandler<T>> TypeRegistrar<T> property(Property<? super Handler> property,
+                                                                              String description,
+                                                                              @NotNull Handler handler) {
+            this.classInfo.property(property, description, Registration.this.addon, handler);
             return this;
         }
 
@@ -419,14 +431,13 @@ public class Registration {
         final String prefix;
         final String suffix;
         final @NotNull EnumWrapper<T> enumWrapper;
-        final ClassInfo<T> classInfo;
 
         private EnumTypeRegistrar(Class<T> type, String codename, String prefix, String suffix, boolean plurals) {
             super(type, codename);
             this.prefix = prefix;
             this.suffix = suffix;
             this.enumWrapper = new EnumWrapper<>(type, prefix, suffix, plurals);
-            this.usage = this.enumWrapper.getAllNames();
+            this.usage(this.enumWrapper.getAllNames());
             this.classInfo = this.enumWrapper.getClassInfo(codename);
         }
 
@@ -435,7 +446,7 @@ public class Registration {
             this.prefix = prefix;
             this.suffix = suffix;
             this.enumWrapper = enumWrapper;
-            this.usage = this.enumWrapper.getAllNames();
+            this.usage(this.enumWrapper.getAllNames());
             this.classInfo = this.enumWrapper.getClassInfo(codename);
         }
     }
@@ -532,7 +543,6 @@ public class Registration {
         final String prefix;
         final String suffix;
         final boolean createUsage;
-        final ClassInfo<T> classInfo;
 
         private RegistryTypeRegistrar(Registry<T> registry, Class<T> type, String codename, boolean createUsage, String prefix, String suffix) {
             super(type, codename);
@@ -544,7 +554,7 @@ public class Registration {
             this.classInfo = RegistryClassInfo.create(registry, type, createUsage, codename, prefix, suffix);
             @Nullable String[] classInfoUsage = this.classInfo.getUsage();
             if (classInfoUsage != null) {
-                this.usage = String.join(", ", classInfoUsage);
+                this.usage(String.join(", ", classInfoUsage));
             }
         }
     }
@@ -1117,56 +1127,17 @@ public class Registration {
 
         // TYPES
         for (TypeRegistrar type : getTypes()) {
-            ClassInfo<?> classInfo;
-            if (type instanceof EnumTypeRegistrar<?> enumTypeRegistrar) {
-                classInfo = enumTypeRegistrar.classInfo;
-            } else if (type instanceof RegistryTypeRegistrar<? extends Keyed> registryTypeRegistrar) {
-                classInfo = registryTypeRegistrar.classInfo;
-            } else {
-                classInfo = new ClassInfo<>(type.type, type.codename);
-            }
-            if (type.getDocumentation().getName() != null) {
-                classInfo.name(type.getDocumentation().getName());
-            }
-            if (type.user != null) {
-                classInfo.user(type.user);
-            }
-            if (type.usage != null && classInfo.getUsage() == null) {
-                classInfo.usage(type.usage);
-            }
-            if (type.before != null) {
-                classInfo.before(type.before);
-            }
-            if (type.after != null) {
-                classInfo.after(type.after);
-            }
-            if (type.defaultExpression != null) {
-                classInfo.defaultExpression(type.defaultExpression);
-            }
-            if (type.supplier != null) {
-                classInfo.supplier(type.supplier);
-            }
-            if (type.parser != null) {
-                classInfo.parser(type.parser);
-            }
-            if (type.serializer != null) {
-                classInfo.serializer(type.serializer);
-            }
-            if (type.cloner != null) {
-                classInfo.cloner(type.cloner);
-            }
-            if (type.changer != null) {
-                classInfo.changer(type.changer);
-            }
-            if (Classes.getClassInfoNoError(type.codename) != null) {
-                error("ClassInfo with code name '%s' is already registered!", type.codename);
-                error("You may need to use that addon's '%s' type with %s's syntaxes.", type.type.getName(), this.addon.name());
+            ClassInfo classInfo = type.classInfo;
+            if (Classes.getClassInfoNoError(classInfo.getCodeName()) != null) {
+                error("ClassInfo with code name '%s' is already registered!", classInfo.getCodeName());
+                error("You may need to use that addon's '%s' type with %s's syntaxes.", classInfo.getClass().getName(), this.addon.name());
                 continue;
-            } else if (Classes.getExactClassInfo(type.type) != null) {
-                error("ClassInfo with type '%s' is already registered!", type.type);
-                error("You may need to use that addon's '%s' type with %s's syntaxes.", type.type.getName(), this.addon.name());
+            } else if (Classes.getExactClassInfo(classInfo.getC()) != null) {
+                error("ClassInfo with type '%s' is already registered!", classInfo.getC());
+                error("You may need to use that addon's '%s' type with %s's syntaxes.", classInfo.getC().getName(), this.addon.name());
                 continue;
             }
+
             Classes.registerClass(classInfo);
         }
     }
