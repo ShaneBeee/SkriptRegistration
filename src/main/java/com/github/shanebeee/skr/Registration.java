@@ -36,6 +36,8 @@ import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
 import org.skriptlang.skript.common.function.DefaultFunction;
 import org.skriptlang.skript.lang.converter.Converter;
 import org.skriptlang.skript.lang.entry.EntryValidator;
+import org.skriptlang.skript.lang.properties.Property;
+import org.skriptlang.skript.lang.properties.handlers.base.PropertyHandler;
 import org.skriptlang.skript.lang.structure.Structure;
 import org.skriptlang.skript.registration.DefaultSyntaxInfos;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -380,6 +382,25 @@ public class Registration {
 
         public TypeRegistrar<T> changer(Changer<? super T> changer) {
             this.classInfo.changer(changer);
+            return this;
+        }
+
+        /**
+         * Registers this class as having the given property, using the given property handler.
+         * <p>Copied from {@link ClassInfo}</p>
+         *
+         * @param property    The property this class should have
+         * @param description A short description of the property for documentation
+         * @param handler     The handler for this property
+         * @param <Handler>   The type of the property handler
+         * @return This Type registrar
+         * @throws IllegalStateException If this property is already registered for this class
+         */
+        @SuppressWarnings({"UnstableApiUsage"})
+        public <Handler extends PropertyHandler<T>> TypeRegistrar<T> property(Property<? super Handler> property,
+                                                                              String description,
+                                                                              @NotNull Handler handler) {
+            this.classInfo.property(property, description, Registration.this.addon, handler);
             return this;
         }
 
