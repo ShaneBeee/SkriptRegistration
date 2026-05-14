@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -432,22 +433,20 @@ public class Registration {
         final String suffix;
         final @NotNull EnumWrapper<T> enumWrapper;
 
-        private EnumTypeRegistrar(Class<T> type, String codename, String prefix, String suffix, boolean plurals) {
+        private EnumTypeRegistrar(Class<T> type, String codename, Consumer<ClassInfo<T>> consumer, String prefix, String suffix, boolean plurals) {
             super(type, codename);
             this.prefix = prefix;
             this.suffix = suffix;
             this.enumWrapper = new EnumWrapper<>(type, prefix, suffix, plurals);
-            this.usage(this.enumWrapper.getAllNames());
-            this.classInfo = this.enumWrapper.getClassInfo(codename);
+            this.classInfo = this.enumWrapper.getClassInfo(codename, consumer);
         }
 
-        private EnumTypeRegistrar(Class<T> type, @NotNull EnumWrapper<T> enumWrapper, String codename, String prefix, String suffix) {
+        private EnumTypeRegistrar(Class<T> type, @NotNull EnumWrapper<T> enumWrapper, String codename, Consumer<ClassInfo<T>> consumer, String prefix, String suffix) {
             super(type, codename);
             this.prefix = prefix;
             this.suffix = suffix;
             this.enumWrapper = enumWrapper;
-            this.usage(this.enumWrapper.getAllNames());
-            this.classInfo = this.enumWrapper.getClassInfo(codename);
+            this.classInfo = this.enumWrapper.getClassInfo(codename, consumer);
         }
     }
 
@@ -460,7 +459,20 @@ public class Registration {
      * @return New EnumTypeRegistrar (Don't forget to register it!)
      */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, String codename) {
-        return new EnumTypeRegistrar<>(type, codename, null, null, false);
+        return new EnumTypeRegistrar<>(type, codename, null, null, null, false);
+    }
+
+    /**
+     * Create a new {@link EnumTypeRegistrar} for a custom {@link EnumWrapper EnumClassInfo}.
+     *
+     * @param type     Class to register
+     * @param codename Codename of new type
+     * @param consumer Consumer to accept the ClassInfo for customization
+     * @param <T>      Type of class to register.
+     * @return New EnumTypeRegistrar (Don't forget to register it!)
+     */
+    public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, String codename, Consumer<ClassInfo<T>> consumer) {
+        return new EnumTypeRegistrar<>(type, codename, consumer, null, null, false);
     }
 
     /**
@@ -473,7 +485,7 @@ public class Registration {
      * @return New EnumTypeRegistrar (Don't forget to register it!)
      */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, String codename, boolean plurals) {
-        return new EnumTypeRegistrar<>(type, codename, null, null, plurals);
+        return new EnumTypeRegistrar<>(type, codename, null, null, null, plurals);
     }
 
     /**
@@ -487,7 +499,7 @@ public class Registration {
      * @return New EnumTypeRegistrar (Don't forget to register it!)
      */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, String codename, String prefix, String suffix) {
-        return new EnumTypeRegistrar<>(type, codename, prefix, suffix, false);
+        return new EnumTypeRegistrar<>(type, codename, null, prefix, suffix, false);
     }
 
     /**
@@ -502,7 +514,7 @@ public class Registration {
      * @return New EnumTypeRegistrar (Don't forget to register it!)
      */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, String codename, String prefix, String suffix, boolean plurals) {
-        return new EnumTypeRegistrar<>(type, codename, prefix, suffix, plurals);
+        return new EnumTypeRegistrar<>(type, codename, null, prefix, suffix, plurals);
     }
 
     /**
@@ -515,7 +527,7 @@ public class Registration {
      * @return New EnumTypeRegistrar (Don't forget to register it!)
      */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, EnumWrapper<T> enumWrapper, String codename) {
-        return new EnumTypeRegistrar<>(type, enumWrapper, codename, null, null);
+        return new EnumTypeRegistrar<>(type, enumWrapper, codename, null, null, null);
     }
 
     /**
@@ -530,7 +542,7 @@ public class Registration {
      * @return New EnumTypeRegistrar (Don't forget to register it!)
      */
     public <T extends Enum<T>> EnumTypeRegistrar<T> newEnumType(Class<T> type, EnumWrapper<T> enumWrapper, String codename, String prefix, String suffix) {
-        return new EnumTypeRegistrar<>(type, enumWrapper, codename, prefix, suffix);
+        return new EnumTypeRegistrar<>(type, enumWrapper, codename, null, prefix, suffix);
     }
 
     /**

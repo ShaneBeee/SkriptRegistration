@@ -153,9 +153,11 @@ public final class EnumWrapper<E extends Enum<E>> {
      * @param consumer Consumer to modify the classinfo before returning
      * @return ClassInfo with default parser and usage
      */
-    public @NotNull ClassInfo<E> getClassInfo(String codeName, Consumer<ClassInfo<E>> consumer) {
+    public @NotNull ClassInfo<E> getClassInfo(String codeName, @Nullable Consumer<ClassInfo<E>> consumer) {
         ClassInfo<E> classInfo = new ClassInfo<>(this.enumClass, codeName);
-        consumer.accept(classInfo);
+        if (consumer != null) {
+            consumer.accept(classInfo);
+        }
         if (classInfo.getUsage() == null) {
             classInfo.usage(getAllNames());
         }
