@@ -1,6 +1,7 @@
 package com.github.shanebeee.skr.skript;
 
 import ch.njol.skript.classes.ClassInfo;
+import ch.njol.skript.classes.EnumSerializer;
 import ch.njol.skript.classes.Parser;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.util.StringUtils;
@@ -137,24 +138,14 @@ public final class EnumWrapper<E extends Enum<E>> {
      * Create ClassInfo with default parser and usage
      *
      * @param codeName Name for class info
-     * @return ClassInfo with default parser and usage
-     */
-    public @NotNull ClassInfo<E> getClassInfo(String codeName) {
-        List<E> enums = new ArrayList<>(List.of(this.enumClass.getEnumConstants()));
-        enums.sort(Comparator.comparing(Enum::name));
-        return new ClassInfo<>(this.enumClass, codeName).usage(getAllNames()).parser(new EnumParser<>(this))
-            .supplier(enums::iterator);
-    }
-
-    /**
-     * Create ClassInfo with default parser and usage
-     *
-     * @param codeName Name for class info
-     * @param consumer Consumer to modify the classinfo before returning
+     * @param consumer Consumer to modify the ClassInfo before returning
      * @return ClassInfo with default parser and usage
      */
     public @NotNull ClassInfo<E> getClassInfo(String codeName, @Nullable Consumer<ClassInfo<E>> consumer) {
         ClassInfo<E> classInfo = new ClassInfo<>(this.enumClass, codeName);
+        List<E> enums = new ArrayList<>(List.of(this.enumClass.getEnumConstants()));
+        enums.sort(Comparator.comparing(Enum::name));
+
         if (consumer != null) {
             consumer.accept(classInfo);
         }
@@ -163,6 +154,12 @@ public final class EnumWrapper<E extends Enum<E>> {
         }
         if (classInfo.getParser() == null) {
             classInfo.parser(new EnumParser<>(this));
+        }
+        if (classInfo.getSerializer() == null) {
+            classInfo.serializer(new EnumSerializer<>(this.enumClass));
+        }
+        if (classInfo.getSupplier() == null) {
+            classInfo.supplier(enums::iterator);
         }
         return classInfo;
     }
