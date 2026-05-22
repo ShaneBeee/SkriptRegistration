@@ -19,6 +19,7 @@ import ch.njol.skript.lang.Section;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.util.StringUtils;
 import com.github.shanebeee.skr.skript.EnumWrapper;
 import com.github.shanebeee.skr.skript.RegistryClassInfo;
 import io.papermc.paper.registry.RegistryAccess;
@@ -361,13 +362,34 @@ public class Registration {
             return this;
         }
 
+        public TypeRegistrar<T> parser(Parser<? extends T> parser) {
+            this.classInfo.parser(parser);
+            return this;
+        }
+
         public TypeRegistrar<T> supplier(Supplier<Iterator<T>> supplier) {
             this.classInfo.supplier(supplier);
             return this;
         }
 
-        public TypeRegistrar<T> parser(Parser<? extends T> parser) {
-            this.classInfo.parser(parser);
+        /**
+         * Automatically generates usage strings from a supplier and parser.
+         * <p>
+         * Do note this is required to be put AFTER parser/supplier.
+         * </p>
+         *
+         * @return This registrar for chaining.
+         */
+        public TypeRegistrar<T> usageFromSupplier() {
+            Supplier<Iterator<T>> supplier = this.classInfo.getSupplier();
+            Parser<T> parser = (Parser<T>) this.classInfo.getParser();
+            if (supplier == null || parser == null) return this;
+
+            List<String> usages = new ArrayList<>();
+            supplier.get().forEachRemaining(t -> usages.add(parser.toString(t, 0)));
+
+            this.classInfo.usage(StringUtils.join(usages, ", "));
+
             return this;
         }
 
