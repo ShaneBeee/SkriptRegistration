@@ -362,7 +362,6 @@ public class JsonDocGenerator {
             expressionsArray.add(syntaxObject);
         }
         Utils.log("<#E40CF0>Finished checking changers, resume watching console");
-        Utils.error("Test error");
 
         this.total += expressionsArray.size();
         Utils.log("Generated %s expressions.", expressionsArray.size());
